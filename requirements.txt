@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+openai
+llama-index
+pinecone-client
+supabase
+python-dotenv

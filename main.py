@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from rag.query_engine import query_router
 from rag.ingest import ingest_document
@@ -27,6 +27,7 @@ async def query(request: Request):
     return response
 
 @app.post("/ingest")
-async def ingest(request: Request):
-    data = await request.json()
-    return ingest_document(data)
+async def ingest(file: UploadFile = File(...), project: str = Form(...), tags: str = Form("")):
+    tag_list = [t.strip() for t in tags.split(",") if t]
+    result = ingest_document(file, project, tag_list)
+    return result

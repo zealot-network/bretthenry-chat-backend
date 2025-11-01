@@ -3,10 +3,11 @@ uvicorn
 openai
 llama-index
 llama-index-vector-stores-pinecone
-pinecone-client
-supabase
-python-dotenv
-
 llama-index-llms-openai
 llama-index-llms-anthropic
 llama-index-llms-gemini
+pinecone-client
+supabase
+python-dotenv
+PyPDF2
+python-docx

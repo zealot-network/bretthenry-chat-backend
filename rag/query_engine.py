@@ -2,20 +2,20 @@ import os
 from llama_index.core import VectorStoreIndex, ServiceContext
 from llama_index.vector_stores.pinecone import PineconeVectorStore
 from llama_index.embeddings.openai import OpenAIEmbedding
-from llama_index.llms import OpenAI, Anthropic, Gemini
+from llama_index.llms.openai import OpenAI
+from llama_index.llms.anthropic import Anthropic
+from llama_index.llms.gemini import Gemini
 
 
 def get_engine(model: str = "gpt-4"):
     vector_store = PineconeVectorStore(index_name=os.getenv("PINECONE_INDEX_NAME"))
     embed_model = OpenAIEmbedding(model="text-embedding-3-large")
-
     llm_map = {
         "gpt-4": OpenAI(model="gpt-4-turbo", temperature=0.3),
         "claude": Anthropic(model="claude-3-sonnet-2024"),
         "gemini": Gemini(model="gemini-1.5-pro"),
     }
     llm = llm_map.get(model, llm_map["gpt-4"])
-
     service_context = ServiceContext.from_defaults(llm=llm, embed_model=embed_model)
     return VectorStoreIndex.from_vector_store(vector_store, service_context=service_context)
 

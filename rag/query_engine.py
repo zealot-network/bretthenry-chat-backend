@@ -1,7 +1,7 @@
 import os
 from llama_index.core import VectorStoreIndex, ServiceContext
-from llama_index.vector_stores import PineconeVectorStore
-from llama_index.embeddings import OpenAIEmbedding
+from llama_index.vector_stores.pinecone import PineconeVectorStore
+from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.llms import OpenAI, Anthropic, Gemini
 
 

@@ -2,6 +2,7 @@ fastapi
 uvicorn
 openai
 llama-index
+llama-index-vector-stores-pinecone
 pinecone-client
 supabase
 python-dotenv

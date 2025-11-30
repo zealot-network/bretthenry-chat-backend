@@ -17,6 +17,51 @@ app.add_middleware(
 @app.get("/healthz")
 async def health_check():
     return {"status": "ok"}
+from sqlalchemy import create_engine
+import pandas as pd
+import io
+import os
+from datetime import datetime
+from supabase import create_client
+
+# Environment variables for database and Supabase
+DATABASE_URL = os.getenv("DATABASE_URL")
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+
+# SQLAlchemy engine and Supabase client
+engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+@app.post("/data")
+async def upload_data(file: UploadFile, table_name: str = Form("uploads_table")):
+    try:
+        # Load file into DataFrame
+        if file.filename.endswith(".csv"):
+            df = pd.read_csv(file.file)
+        elif file.filename.endswith(".xlsx"):
+            df = pd.read_excel(file.file)
+        elif file.filename.endswith((".json", ".jsonl")):
+            content = await file.read()
+            df = pd.read_json(io.BytesIO(content), lines=True)
+        else:
+            return {"error": "Unsupported file format."}
+
+        # Insert rows into the designated Postgres table
+        df.to_sql(table_name, engine, if_exists="append", index=False)
+
+        # Log metadata to Supabase
+        metadata = {
+            "filename": file.filename,
+            "table_name": table_name,
+            "rows_inserted": len(df),
+            "uploaded_at": datetime.utcnow().isoformat()
+        }
+        supabase.table("data_uploads").insert(metadata).execute()
+
+        return {"status": "success", **metadata}
+    except Exception as e:
+        return {"error": str(e)}
 
 @app.post("/query")
 async def query(request: Request):

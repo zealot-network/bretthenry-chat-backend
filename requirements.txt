@@ -11,3 +11,4 @@ supabase
 python-dotenv
 PyPDF2
 python-docx
+psycopg2-binary>=2.9

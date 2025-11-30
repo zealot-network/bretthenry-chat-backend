@@ -59,6 +59,14 @@ async def upload_data(file: UploadFile, table_name: str = Form("uploads_table"))
         }
         supabase.table("data_uploads").insert(metadata).execute()
 
+@app.get("/data/uploads")
+async def get_data_uploads():
+    try:
+        response = supabase.table("data_uploads").select("*").order("uploaded_at", desc=True).execute()
+        data = response.data if hasattr(response, "data") else response
+        return {"uploads": data}
+    except Exception as e:
+        return {"error": str(e)}
         return {"status": "success", **metadata}
     except Exception as e:
         return {"error": str(e)}
